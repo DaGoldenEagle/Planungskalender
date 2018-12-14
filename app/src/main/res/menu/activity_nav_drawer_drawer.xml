@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_refresh"
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:title="Aktualisieren" />
+        <item
+            android:id="@+id/nav_events"
+            android:icon="@drawable/ic_event_black"
+            android:title="Events" />
+        <item
+            android:id="@+id/nav_archive"
+            android:icon="@drawable/ic_event_black"
+            android:title="Archiv-Events" />
+        <item
+            android:id="@+id/nav_password"
+            android:icon="@drawable/ic_vpn_key_black_24dp"
+            android:title="Passwort ändern" />
+        <item
+            android:id="@+id/nav_admin"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Admin" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_cancel_black_24dp"
+            android:title="Logout" />
+        <item
+            android:id="@+id/nav_close"
+            android:icon="@drawable/ic_cancel_black_24dp"
+            android:title="Schließen" />
+    </group>
+
+
+
+</menu>
