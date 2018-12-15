@@ -1,8 +1,10 @@
 package de.wm.planungskalender;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class PlanungskalenderApi {
     Context context;
@@ -45,6 +49,7 @@ public class PlanungskalenderApi {
             }
 
             Cookies = res.cookies();
+
 
 
             org.jsoup.nodes.Document doc = null;
@@ -152,6 +157,14 @@ public class PlanungskalenderApi {
                         newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
                     }
 
+                    DBHandler dbHandler = new DBHandler(context, null, null, 1);
+                    DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
+                    for (int k = 1; k <=rows.size() ; k++) {
+                        if(dbHandler.findEventByRealId(k)!=null) {
+                            dbHandlerBackup.addEvent(dbHandler.findEventById(k));
+                        }
+                    }
+
                     returnString = "Login erfolgreich";
                     resultStr = "login";
 
@@ -238,13 +251,13 @@ public class PlanungskalenderApi {
                     Elements cols = row.select("td");
 
                     Element prevrow = rows.get(i - 1);
-                    Elements prevcols ;
+                    Elements prevcols;
                     int intj = 1;
                     if (cols.get(0).html().equalsIgnoreCase("&nbsp;")) { //Test if date is displayed in previous row
                         //events on same date as previous
-                        while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")){
+                        while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")) {
                             intj++;
-                            prevrow = rows.get(i-intj);
+                            prevrow = rows.get(i - intj);
                         }
                         prevcols = prevrow.select("td");
 
@@ -316,8 +329,17 @@ public class PlanungskalenderApi {
                     }
 
 
-
                 }
+                DBHandler dbHandler = new DBHandler(context, null, null, 1);
+                DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
+                for (int i = 1; i <=rows.size() ; i++) {
+                    if(dbHandler.findEventByRealId(i)!=null) {
+                        dbHandlerBackup.addEvent(dbHandler.findEventById(i));
+                    }
+                }
+
+                //dbHandlerBackup.addEvent(new Event(999,"Backup",66,"12.12.2018","00:00","lol ez",new ArrayList<String>(),new ArrayList<String>(),"lol","Ja"));
+
                 returnString = "Login erfolgreich";
                 resultStr = "login";
 
@@ -339,6 +361,7 @@ public class PlanungskalenderApi {
         result.put("result", resultStr);
         result.put("returnString", returnString);
         result.putAll(Cookies);
+
 
         return result;
 
@@ -406,8 +429,10 @@ public class PlanungskalenderApi {
                     } else {
                         ISSIGNEDIN = isSignedIn.html();
                     }
+                    Element signedUpPeople = cols.get(5);
+                    String SIGNEDUPPEOPLE = signedUpPeople.html();
                     if (DBH.findEvent(NAME) != null) {
-                        DBH.setSignedIn(NAME,ISSIGNEDIN);
+                        DBH.setSignedIn(NAME, ISSIGNEDIN,SIGNEDUPPEOPLE);
                     }
 
                     returnString = "Login erfolgreich";
@@ -566,7 +591,6 @@ public class PlanungskalenderApi {
 
     }
 
-
     private void newEvent(int id, String eventname, int users, String date, String time, Map<String, String> Cookies, String isSignedIn) {
         DBHandler dbHandler = new DBHandler(context, null, null, 1);
 
@@ -591,6 +615,9 @@ public class PlanungskalenderApi {
 
         org.jsoup.nodes.Document doc = null;
         try {
+            if(res == null){
+                return;
+            }
             doc = res.parse();
         } catch (IOException e) {
             e.printStackTrace();
@@ -612,7 +639,7 @@ public class PlanungskalenderApi {
                 signedIn = getSignedIn(signedInTableRows);
                 int kl = 7;
                 Element signedOutTable = null;
-                while(!rows.get(kl).selectFirst("td").html().contains("Abgesagt")){
+                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
                     kl++;
                     signedOutTable = rows.get(kl).selectFirst("table");
                 }
@@ -645,7 +672,7 @@ public class PlanungskalenderApi {
 
                 int kl = 7;
                 Element signedOutTable = null;
-                while(!rows.get(kl).selectFirst("td").html().contains("Abgesagt")){
+                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
                     kl++;
                     signedOutTable = rows.get(kl).selectFirst("table");
                 }
@@ -659,7 +686,7 @@ public class PlanungskalenderApi {
 
                 int kl = 7;
                 Element signedOutTable = null;
-                while(!rows.get(kl).selectFirst("td").html().contains("Abgesagt")){
+                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
                     kl++;
                     signedOutTable = rows.get(kl).selectFirst("table");
                 }
@@ -747,7 +774,6 @@ public class PlanungskalenderApi {
 
     }
 
-
     private ArrayList<String> getSignedOut(Elements signedOutTableRows) {
 
         ArrayList<String> signedOut = new ArrayList<>();
@@ -763,7 +789,6 @@ public class PlanungskalenderApi {
         return signedOut;
 
     }
-
 
     private boolean checkForConnection() {
         ConnectivityManager connectivityManager

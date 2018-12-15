@@ -45,4 +45,6 @@
     <string name="anmelden">Anmelden</string>
     <string name="abmelden">Abmelden</string>
     <string name="StayLoIn">Eingeloggt bleiben</string>
+    <string name="aktualisieren">Aktualisieren...</string>
+    <string name="preference_file_key">"de.wm.planungskalender.shared_preferences"</string>
 </resources>

@@ -1,6 +1,8 @@
 package de.wm.planungskalender;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -10,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,13 +21,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Events extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class Events extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     boolean isOffline;
     ArrayList<Event> events;
@@ -32,13 +36,17 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
     String cookie;
     private RecyclerView rv;
 
+    CardView cv;
+
+    NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_drawer);
 
-
+        cv = findViewById(R.id.refreshcardview);
         /*
          * ############################################
          * Navigation Drawer and Toolbar
@@ -53,7 +61,7 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         /*
@@ -79,6 +87,17 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
          * Recycler View and Adapter
          * ############################################
          */
+
+
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        if (sharedPref.getString("cookie", null) != null) {
+            cookie = sharedPref.getString("cookie", null);
+        }
+        final boolean refresh = intent.getBooleanExtra("refresh", false);
+        if (refresh) {
+            refreshData();
+        }
         rv = findViewById(R.id.rv);
 
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
@@ -86,6 +105,14 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
 
         initializeData();
         initializeAdapter(isOffline);
+        soutData();
+        /*if(events.size()==0){
+
+            Intent myIntent = new Intent(this, MainActivity.class);
+            myIntent.putExtra("IFAIL", true);
+            this.startActivity(myIntent);
+            finish();
+        }*/
 
         /*
          * ############################################
@@ -98,6 +125,11 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
             UserID = DBh.getUser().get_userid();
 
             cookie = DBh.getUser().get_cookies().get("PHPSESSID");
+
+            sharedPref = getSharedPreferences(
+                    getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            sharedPref.edit().putString("cookie", cookie).apply();
+
         }
 
         /*
@@ -144,29 +176,8 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
 
                     }
 
-                    View Name = ChildView[0].findViewById(R.id.EventName);
-                    View time = ChildView[0].findViewById(R.id.time);
-                    View imageView = ChildView[0].findViewById(R.id.imageView);
-                    View uhr = ChildView[0].findViewById(R.id.uhr);
-                    View imageView3 = ChildView[0].findViewById(R.id.imageView3);
-                    View users = ChildView[0].findViewById(R.id.users);
-                    View signedUp = ChildView[0].findViewById(R.id.signedUp);
-                    View imageView4 = ChildView[0].findViewById(R.id.imageView4);
-                    View dateday = ChildView[0].findViewById(R.id.dateday);
-
-
-                    // Pair<View, String> pair1 = Pair.create(Name, Name.getTransitionName());
-                    Pair<View, String> pair2 = Pair.create(time, time.getTransitionName());
-                    Pair<View, String> pair3 = Pair.create(imageView, imageView.getTransitionName());
-                    Pair<View, String> pair4 = Pair.create(uhr, uhr.getTransitionName());
-                    Pair<View, String> pair5 = Pair.create(imageView3, imageView3.getTransitionName());
-                    Pair<View, String> pair6 = Pair.create(users, users.getTransitionName());
-                    Pair<View, String> pair7 = Pair.create(signedUp, signedUp.getTransitionName());
-                    Pair<View, String> pair8 = Pair.create(imageView4, imageView4.getTransitionName());
-
-                    Bundle options = ActivityOptionsCompat.makeSceneTransitionAnimation(Events.this, pair2, pair3, pair4, pair5, pair6, pair7, pair8).toBundle();
-
-                    Events.this.startActivity(myIntent/*, options*/);
+                    Events.this.startActivity(myIntent);
+                    finish();
 
                 }
 
@@ -199,18 +210,27 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
     private void initializeData() {
         events = null;
         events = new ArrayList<>();
-        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        if (!isOffline) {
+            DBHandler dbHandler = new DBHandler(this, null, null, 1);
 
-        int i = 1;
-        while (dbHandler.findEventById(i) != null) {
-            events.add(dbHandler.findEventById(i));
-            i++;
+            int i = 1;
+            while (dbHandler.findEventById(i) != null) {
+                events.add(dbHandler.findEventById(i));
+                i++;
 
+            }
+            dbHandler.close();
+        } else {
+            DBHandlerBackup dbHandler = new DBHandlerBackup(this, null, null, 1);
+
+            int i = 1;
+            while (dbHandler.findEventById(i) != null) {
+                events.add(dbHandler.findEventById(i));
+                i++;
+
+            }
+            dbHandler.close();
         }
-        dbHandler.close();
-
-
-        soutData();
 
 
     }
@@ -219,11 +239,6 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
 
         RVAdapter adapter = new RVAdapter(events, isOffline);
         rv.setAdapter(adapter);
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 
     @Override
@@ -300,19 +315,28 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
 
         new refresh().execute();
 
-        //soutData();
     }
+
 
     public class refresh extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    navigationView.getMenu().getItem(0).setVisible(false);
+                    cv.setVisibility(View.VISIBLE);
+
+                }
+            });
 
             PlanungskalenderApi api = new PlanungskalenderApi(Events.this);
             Map<String, String> cookies = new HashMap<>();
             cookies.put("PHPSESSID", cookie);
+                api.EventsToDatabase(cookies);
 
-            //api.refreshSignedIn(cookies);
-            api.EventsToDatabase(cookies);
             return "";
         }
 
@@ -322,19 +346,30 @@ public class Events extends AppCompatActivity implements View.OnClickListener, N
 
             RVAdapter adapter = new RVAdapter(events, isOffline);
             rv.swapAdapter(adapter, true);
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    cv.setVisibility(View.GONE);
+                    navigationView.getMenu().getItem(0).setVisible(true);
+
+                }
+            });
         }
     }
-    public void soutData(){
+
+    public void soutData() {
         //DEBUG vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
         Object[] eventsarr = events.toArray();
         Event[] eventarr2 = new Event[eventsarr.length];
         String[] eventarr3 = new String[eventsarr.length];
-        for (int j = 0; j <eventsarr.length ; j++) {
+        for (int j = 0; j < eventsarr.length; j++) {
             eventarr2[j] = (Event) eventsarr[j];
-            eventarr3[j] = eventarr2[j].get_eventname() +";"+Arrays.toString(eventarr2[j].get_signedOut().toArray());
+            eventarr3[j] = eventarr2[j].get_eventname() + ";" + Arrays.toString(eventarr2[j].get_signedOut().toArray());
         }
-        Log.d("refreshData",Arrays.toString(eventarr3));
+        Log.d("refreshData", Arrays.toString(eventarr3));
 
         //DEBUG^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     }

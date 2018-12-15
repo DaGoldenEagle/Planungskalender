@@ -5,59 +5,62 @@
     android:id="@+id/cv"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
-    android:layout_marginEnd="12dp"
     android:layout_marginStart="12dp"
     android:layout_marginTop="6dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="6dp"
     android:clickable="false"
     app:cardElevation="2dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:contextClickable="false"
+        android:longClickable="false">
 
         <TextView
             android:id="@+id/dateday"
-            android:transitionName="dateday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif"
             android:text="@string/dateday"
             android:textAllCaps="false"
             android:textColor="?attr/editTextColor"
             android:textSize="20sp"
+            android:transitionName="dateday"
             app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:transitionName="dateyear"
             android:id="@+id/year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/year"
             android:textColor="?attr/editTextColor"
+            android:transitionName="dateyear"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:transitionName="datemonth"
             android:id="@+id/month"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/month"
             android:textColor="?attr/editTextColor"
+            android:transitionName="datemonth"
             app:layout_constraintBottom_toTopOf="@+id/year"
             app:layout_constraintEnd_toStartOf="@+id/relativeLayout"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,9 +70,9 @@
             android:id="@+id/relativeLayout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="8dp"
             android:layout_marginStart="75dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:elevation="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,29 +81,28 @@
             <ImageView
                 android:id="@+id/imageView"
 
-                android:transitionName="ClockIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/EventName"
                 android:layout_below="@+id/EventName"
+                android:layout_alignStart="@+id/EventName"
                 android:layout_marginTop="8dp"
                 android:contentDescription="@string/clock"
+                android:transitionName="ClockIcon"
                 app:srcCompat="@drawable/ic_schedule_black_24dp" />
 
             <android.support.v7.widget.AppCompatImageView
-                android:transitionName="PeopleIcon"
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/imageView"
                 android:layout_below="@+id/time"
+                android:layout_alignStart="@+id/imageView"
                 android:layout_marginTop="8dp"
                 android:contentDescription="@string/people"
                 android:scaleType="center"
+                android:transitionName="PeopleIcon"
                 app:srcCompat="@drawable/ic_people_black_24dp" />
 
             <android.support.v7.widget.AppCompatImageView
-                android:transitionName="PersonIcon"
                 android:id="@+id/imageView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -110,10 +112,10 @@
                 android:layout_toEndOf="@+id/users"
                 android:contentDescription="@string/person"
                 android:scaleType="center"
+                android:transitionName="PersonIcon"
                 app:srcCompat="@drawable/ic_person_black_24dp" />
 
             <TextView
-                android:transitionName="ClockUhr"
                 android:id="@+id/uhr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,23 +124,23 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@+id/time"
                 android:text="@string/uhrConst"
-                android:textColor="?attr/editTextColor" />
+                android:textColor="?attr/editTextColor"
+                android:transitionName="ClockUhr" />
 
             <TextView
-                android:transitionName="PeopleNum"
                 android:id="@+id/users"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/time"
-                android:layout_marginBottom="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
                 android:layout_toEndOf="@+id/imageView3"
                 android:text="@string/users"
-                android:textColor="?attr/editTextColor" />
+                android:textColor="?attr/editTextColor"
+                android:transitionName="PeopleNum" />
 
             <TextView
-                android:transitionName="PersonLoggedIn"
                 android:id="@+id/signedUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,10 +149,10 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@+id/imageView4"
                 android:text="@string/signedUp"
-                android:textColor="?attr/editTextColor" />
+                android:textColor="?attr/editTextColor"
+                android:transitionName="PersonLoggedIn" />
 
             <TextView
-                android:transitionName="ClockTime"
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -159,7 +161,8 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@+id/imageView"
                 android:text="@string/time"
-                android:textColor="?attr/editTextColor" />
+                android:textColor="?attr/editTextColor"
+                android:transitionName="ClockTime" />
 
             <TextView
                 android:id="@+id/Eventnum"
@@ -173,28 +176,29 @@
 
             <TextView
                 android:id="@+id/EventName"
-                android:transitionName="EventName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/eventName"
                 android:textColor="?attr/editTextColor"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:transitionName="EventName" />
         </RelativeLayout>
 
         <TextView
             android:id="@+id/id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="TextView"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="238dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

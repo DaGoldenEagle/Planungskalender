@@ -5,12 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DBHandler extends SQLiteOpenHelper {
+public class DBHandlerBackup extends SQLiteOpenHelper {
 
     private static final String COLUMN_AUTOID = "KEY_ID";
     private static final String COLUMN_ID = "id";
@@ -24,7 +23,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String COLUMN_INFO = "info";
     private static final String COLUMN_ISSIGNEDIN = "isSignedIn";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "eventsDB.db";
+    private static final String DATABASE_NAME = "eventsBackupDB.db";
     private static final String TABLE_EVENTS = "events";
     /*
       private int id;
@@ -42,8 +41,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
      */
 
-    public DBHandler(Context context, String name,
-                     SQLiteDatabase.CursorFactory factory, int version) {
+    public DBHandlerBackup(Context context, String name,
+                           SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
 
     }
@@ -54,9 +53,15 @@ public class DBHandler extends SQLiteOpenHelper {
                 TABLE_EVENTS + "(" + COLUMN_ID + " INTEGER ," + COLUMN_EVENTNAME
                 + " TEXT," + COLUMN_USERS + " INTEGER," + COLUMN_DATE + " TEXT," + COLUMN_TIME + " TEXT," + COLUMN_CREATOR + " TEXT," + COLUMN_SIGNEDIN + " TEXT," + COLUMN_SIGNEDOUT + " TEXT," + COLUMN_INFO + " TEXT," + COLUMN_ISSIGNEDIN + " TEXT," + COLUMN_AUTOID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ")";
         db.execSQL(CREATE_PRODUCTS_TABLE);
-        //db.close();
 
     }
+
+    public void fillDB(ArrayList<Event> arrayList){
+        for (int i = 0; i < arrayList.size(); i++) {
+            addEvent(arrayList.get(i));
+        }
+    }
+
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion,
                           int newVersion) {
@@ -93,7 +98,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.insert(TABLE_EVENTS, null, values);
-        //db.close();
+        db.close();
     }
 
     public Event findEvent(String eventname) {
@@ -127,7 +132,7 @@ public class DBHandler extends SQLiteOpenHelper {
         } else {
             event = null;
         }
-        //db.close();
+        db.close();
         return event;
     }
 
@@ -163,7 +168,7 @@ public class DBHandler extends SQLiteOpenHelper {
             cursor.close();
             event = null;
         }
-        //db.close();
+        db.close();
         return event;
     }
 
@@ -198,22 +203,20 @@ public class DBHandler extends SQLiteOpenHelper {
         } else {
             event = null;
         }
-
-
-        //db.close();
+        db.close();
         return event;
     }
 
-    public void setSignedIn(String Eventname, String signedIn,String numPeople){
+    public void setSignedIn(String Eventname, String signedIn){
 
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.execSQL("UPDATE "+ TABLE_EVENTS +
-                " SET "+COLUMN_ISSIGNEDIN + " = '"+signedIn + "'"+","+ COLUMN_USERS +" = "+ numPeople +" "+
+                " SET "+COLUMN_ISSIGNEDIN + " = '"+signedIn + "'"+
                 " WHERE "+COLUMN_EVENTNAME+" = '"+Eventname+"';");
 
-        //db.close();
+        db.close();
     }
 
     public boolean deleteEvent(String eventname) {
@@ -235,7 +238,7 @@ public class DBHandler extends SQLiteOpenHelper {
             cursor.close();
             result = true;
         }
-        //db.close();
+        db.close();
         return result;
     }
 
@@ -248,8 +251,9 @@ public class DBHandler extends SQLiteOpenHelper {
         db.rawQuery(query, null);
 
 
-        ////db.close();
+        db.close();
     }
+
 
     public void deleteDatabase() {
 
@@ -261,6 +265,5 @@ public class DBHandler extends SQLiteOpenHelper {
         }
 
     }
-
 
 }

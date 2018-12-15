@@ -88,18 +88,18 @@ public class EventDetails extends Activity {
         signOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(signOut.getText().toString().contains("Abmeldung")){
+                if (signOut.getText().toString().contains("Abmeldung")) {
                     new RevertSignInOut().execute("" + EventID, "" + UserID, cookie);
 
                     signUp.setVisibility(View.VISIBLE);
 
                     signOut.setText("Abmelden");
-                }else if(signOut.getText().toString().contains("Anmeldung")){
+                } else if (signOut.getText().toString().contains("Anmeldung")) {
 
-                    new RevertSignInOut().execute("" + EventID, "" + UserID, cookie);
+                    new RevertSignInOut().execute("" + EventID, "" + UserID, cookie, "rem");
                     signUp.setVisibility(View.VISIBLE);
                     signOut.setText("Abmelden");
-                }else {
+                } else {
                     new LongOperationSignOut().execute("" + EventID, "" + UserID, cookie);
                     signUp.setVisibility(View.GONE);
                     signOut.setText("Abmeldung \nzurücknehmen");
@@ -173,6 +173,10 @@ public class EventDetails extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
+            TextView SignedUpNum = findViewById(R.id.users);
+            int signedUpNum = Integer.decode(SignedUpNum.getText().toString());
+            signedUpNum++;
+            SignedUpNum.setText(Integer.toString(signedUpNum));
 
             TextView signedUp = findViewById(R.id.signedUp);
             signedUp.setText("Ja");
@@ -210,6 +214,7 @@ public class EventDetails extends Activity {
         @Override
         protected void onPostExecute(String result) {
 
+
             TextView signedUp = findViewById(R.id.signedUp);
             signedUp.setText("Nein");
 
@@ -237,15 +242,23 @@ public class EventDetails extends Activity {
         protected String doInBackground(String... params) {
             PlanungskalenderApi api = new PlanungskalenderApi(EventDetails.this);
             api.revertSignInOut(Integer.valueOf(params[0]), params[2]);
-
-            return "" + params[0];
+            if (params.length < 4) {
+                return "" + params[0];
+            } else {
+                return "" + params[3];
+            }
 
 
         }
 
         @Override
         protected void onPostExecute(String result) {
-
+            if (result.contains("rem")) {
+                TextView SignedUpNum = findViewById(R.id.users);
+                int signedUpNum = Integer.decode(SignedUpNum.getText().toString());
+                signedUpNum--;
+                SignedUpNum.setText(Integer.toString(signedUpNum));
+            }
             TextView signedUp = findViewById(R.id.signedUp);
             signedUp.setText("?");
 
@@ -267,4 +280,13 @@ public class EventDetails extends Activity {
         }
     }
 
+    @Override
+    public void finish() {
+
+        Intent myIntent = new Intent(this, Events.class);
+        myIntent.putExtra("refresh",true);
+        myIntent.putExtra("Cookies","");
+        this.startActivity(myIntent);
+        super.finish();
+    }
 }

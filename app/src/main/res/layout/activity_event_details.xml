@@ -273,7 +273,10 @@
                         <android.support.v7.widget.RecyclerView
                             android:id="@+id/rvTeilnehmer"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            android:contextClickable="false"
+                            android:longClickable="false" />
 
                         <View
                             android:id="@+id/div"
@@ -314,7 +317,10 @@
                         <android.support.v7.widget.RecyclerView
                             android:id="@+id/rvAbgesagt"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            android:contextClickable="false"
+                            android:longClickable="false" />
 
                         <View
                             android:id="@+id/div2"

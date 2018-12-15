@@ -4,7 +4,9 @@ package de.wm.planungskalender;
  */
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -39,6 +41,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         DBHandlerOnlineData dbHandlerOnlineData = new DBHandlerOnlineData(this, null, null, 1);
         User stayLoIn = dbHandlerOnlineData.getUser();
+
+        Intent intent = getIntent();
+        boolean InternetFailed = intent.getBooleanExtra("IFAIL", false);
+        if(InternetFailed) {
+            stayLoIn = null;
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("Die Verbindung zum Internet wurde abgebrochen.");
+            builder1.setCancelable(true);
+
+            builder1.setPositiveButton(
+                    "Okay",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        }
+
 
         if (stayLoIn != null) {
 
