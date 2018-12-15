@@ -61,11 +61,11 @@ public class RVAdapterAbgesagt extends RecyclerView.Adapter<RVAdapterAbgesagt.Ev
         EventViewHolder(View itemView) {
             super(itemView);
 
-            eventSignedOut = (TextView) itemView.findViewById(R.id.name);
-            eventSignedOutGuest = (TextView) itemView.findViewById(R.id.name2);
-            id = (TextView) itemView.findViewById(R.id.id);
+            eventSignedOut = itemView.findViewById(R.id.name);
+            eventSignedOutGuest = itemView.findViewById(R.id.name2);
+            id = itemView.findViewById(R.id.id);
 
-            divider = (View) itemView.findViewById(R.id.divider);
+            divider = itemView.findViewById(R.id.divider);
         }
     }
 }

@@ -51,7 +51,6 @@ public class PlanungskalenderApi {
             Cookies = res.cookies();
 
 
-
             org.jsoup.nodes.Document doc = null;
             try {
                 doc = res.parse();
@@ -88,9 +87,14 @@ public class PlanungskalenderApi {
                     Element prevrow = rows.get(i - 1);
                     Elements prevcols = prevrow.select("td");
 
+                    int intj = 1;
                     if (cols.get(0).html().equalsIgnoreCase("&nbsp;")) { //Test if date is displayed in previous row
                         //events on same date as previous
-                        //TODO if more than 2 events are on 1 day
+                        while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")) {
+                            intj++;
+                            prevrow = rows.get(i - intj);
+                        }
+                        prevcols = prevrow.select("td");
                         Element id = cols.get(2);
                         String ID = id.html();
                         ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
@@ -159,8 +163,8 @@ public class PlanungskalenderApi {
 
                     DBHandler dbHandler = new DBHandler(context, null, null, 1);
                     DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
-                    for (int k = 1; k <=rows.size() ; k++) {
-                        if(dbHandler.findEventByRealId(k)!=null) {
+                    for (int k = 1; k <= rows.size(); k++) {
+                        if (dbHandler.findEventByRealId(k) != null) {
                             dbHandlerBackup.addEvent(dbHandler.findEventById(k));
                         }
                     }
@@ -261,7 +265,6 @@ public class PlanungskalenderApi {
                         }
                         prevcols = prevrow.select("td");
 
-                        //TODO if more than 2 events are on 1 day
                         Element id = cols.get(2);
                         String ID = id.html();
                         ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
@@ -332,8 +335,8 @@ public class PlanungskalenderApi {
                 }
                 DBHandler dbHandler = new DBHandler(context, null, null, 1);
                 DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
-                for (int i = 1; i <=rows.size() ; i++) {
-                    if(dbHandler.findEventByRealId(i)!=null) {
+                for (int i = 1; i <= rows.size(); i++) {
+                    if (dbHandler.findEventByRealId(i) != null) {
                         dbHandlerBackup.addEvent(dbHandler.findEventById(i));
                     }
                 }
@@ -432,7 +435,7 @@ public class PlanungskalenderApi {
                     Element signedUpPeople = cols.get(5);
                     String SIGNEDUPPEOPLE = signedUpPeople.html();
                     if (DBH.findEvent(NAME) != null) {
-                        DBH.setSignedIn(NAME, ISSIGNEDIN,SIGNEDUPPEOPLE);
+                        DBH.setSignedIn(NAME, ISSIGNEDIN, SIGNEDUPPEOPLE);
                     }
 
                     returnString = "Login erfolgreich";
@@ -596,8 +599,8 @@ public class PlanungskalenderApi {
 
         //###Get "creator","signedIn","signedOut"
         //TODO if no one is signed in on event
-        String info;
-        String creator;
+        String info = "";
+        String creator = "";
         ArrayList<String> signedIn = new ArrayList<>();
         ArrayList<String> signedOut = new ArrayList<>();
 
@@ -615,7 +618,7 @@ public class PlanungskalenderApi {
 
         org.jsoup.nodes.Document doc = null;
         try {
-            if(res == null){
+            if (res == null) {
                 return;
             }
             doc = res.parse();
@@ -625,129 +628,41 @@ public class PlanungskalenderApi {
 
         Element table = doc.select("table").get(4);
         Elements rows = table.select("tr");
+        Element signedInTable = null;
+        Element signedOutTable = null;
 
-        creator = rows.get(5).select("td").get(1).wholeText();
-
-        if (rows.get(6).select("td").get(0).wholeText().contains("Info")) {
-            info = rows.get(6).select("td").get(1).wholeText();
-
-            if (rows.get(7).select("td").get(0).wholeText().contains("Teilnehmer")) {
-
-                Element signedInTable = rows.get(7).select("td").get(1).selectFirst("table");
-                Elements signedInTableRows = signedInTable.select("tr");
-
-                signedIn = getSignedIn(signedInTableRows);
-                int kl = 7;
-                Element signedOutTable = null;
-                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
-                    kl++;
-                    signedOutTable = rows.get(kl).selectFirst("table");
+        int count = 2;
+        String firstcol;
+        while (count < rows.size()) {
+            firstcol = rows.get(count).select("td").get(0).html();
+            if (rows.get(count).select("td").size() > 1) {
+                if (firstcol.contains("Ersteller")) {
+                    creator = rows.select("td").get(1).html();
                 }
-
-                if (signedOutTable != null && signedOutTable.html().contains("tr")) {
-                    Elements signedOutTableRows = signedOutTable.select("tr");
-                    signedOut = getSignedOut(signedOutTableRows);
+                if (firstcol.contains("Info")) {
+                    info = rows.get(count).select("td").get(1).wholeText();
                 }
-
-            } else {
-                Element signedOutTable = rows.get(8).select("td").get(1).selectFirst("table");
-                Element signedOutTablePre = rows.get(8).select("td").get(1);
-
-                if (signedOutTablePre.html().contains("tr")) {
-                    Elements signedOutTableRows = signedOutTable.select("tr");
-                    signedOut = getSignedOut(signedOutTableRows);
+                if (firstcol.contains("Teilnehmer")) {
+                    signedInTable = rows.get(count).select("td").get(1).selectFirst("table");
                 }
-
+                if (firstcol.contains("Abgesagt")) {
+                    signedOutTable = rows.get(count).select("td").get(1).selectFirst("table");
+                }
             }
+            count++;
+        }
+        if (signedInTable != null && signedInTable.html().contains("tr")) {
+            signedIn = getSignedIn(signedInTable.select("tr"));
+        }
 
-        } else {
-            info = null;
-
-            if (rows.get(6).select("td").get(0).wholeText().contains("Teilnehmer")) {
-
-                Element signedInTable = rows.get(6).select("td").get(1).selectFirst("table");
-                Elements signedInTableRows = signedInTable.select("tr");
-
-                signedIn = getSignedIn(signedInTableRows);
-
-                int kl = 7;
-                Element signedOutTable = null;
-                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
-                    kl++;
-                    signedOutTable = rows.get(kl).selectFirst("table");
-                }
-                if (signedOutTable != null && signedOutTable.html().contains("tr")) {
-                    Elements signedOutTableRows = signedOutTable.select("tr");
-                    signedOut = getSignedOut(signedOutTableRows);
-                }
-
-
-            } else {
-
-                int kl = 7;
-                Element signedOutTable = null;
-                while (!rows.get(kl).selectFirst("td").html().contains("Abgesagt")) {
-                    kl++;
-                    signedOutTable = rows.get(kl).selectFirst("table");
-                }
-                if (signedOutTable.html().contains("tr")) {
-                    Elements signedOutTableRows = signedOutTable.select("tr");
-                    signedOut = getSignedOut(signedOutTableRows);
-                }
-
-            }
-
-
+        if (signedOutTable != null && signedOutTable.html().contains("tr")) {
+            signedOut = getSignedOut(signedOutTable.select("tr"));
         }
 
 
-        /*if (rows.get(6).select("td").get(0).wholeText().contains("Teilnehmer")) {
 
 
-                Element signedInTable = table.select("table").get(2);
 
-                Elements signedInTableRows = signedInTable.select("tr");
-                String person = "";
-                for (int i = 0; i < signedInTableRows.size(); i++) {
-                    person = signedInTableRows.get(i).select("td").get(1).wholeText();
-                    if (person.length() <= 2) {
-                        //TODO if Guests are in one line and seperated by comma the are not displayed correctly
-                        person = signedInTableRows.get(i).select("td").get(2).wholeText();
-                        person = person + "Guest";
-                    }
-                    signedIn.add(person);
-
-
-                }
-
-
-                Element signedOutTable = table.select("table").get(3);
-
-                Elements signedOutTableRows = signedOutTable.select("tr");
-                String person2 = "";
-                for (int i = 0; i < signedOutTableRows.size(); i++) {
-                    person2 = signedOutTableRows.get(i).select("td").get(1).wholeText();
-                    signedOut.add(person2);
-
-
-                }
-            } else {
-                Element signedOutTable = table.select("table").get(2);
-
-                Elements signedOutTableRows = signedOutTable.select("tr");
-                String person2 = "";
-                for (int i = 0; i < signedOutTableRows.size(); i++) {
-                    person2 = signedOutTableRows.get(i).select("td").get(1).wholeText();
-                    signedOut.add(person2);
-
-
-                }
-
-
-            }*/
-
-
-        //###
 
         Event event = new Event(id, eventname, users, date, time, creator, signedIn, signedOut, info, isSignedIn);
         dbHandler.addEvent(event);

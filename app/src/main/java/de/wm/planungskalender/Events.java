@@ -1,6 +1,8 @@
 package de.wm.planungskalender;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -23,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +42,8 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
     CardView cv;
 
     NavigationView navigationView;
+
+    boolean backgroundRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,9 +180,25 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
                         myIntent.putExtra("cookie", cookie);
 
                     }
+                    if (!backgroundRunning) {
+                        Events.this.startActivity(myIntent);
+                        finish();
+                    } else {
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(Events.this);
+                        builder1.setMessage("Die Events werden gerade noch aktualisiert.\n");
+                        builder1.setCancelable(true);
 
-                    Events.this.startActivity(myIntent);
-                    finish();
+                        builder1.setPositiveButton(
+                                "Okay",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+                    }
 
                 }
 
@@ -243,7 +264,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -287,7 +308,6 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
         } else if (id == R.id.nav_events) {
 
         } else if (id == R.id.nav_archive) {
-
         } else if (id == R.id.nav_password) {
 
         } else if (id == R.id.nav_admin) {
@@ -305,7 +325,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
         }
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -321,6 +341,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
     public class refresh extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
+            backgroundRunning = true;
             runOnUiThread(new Runnable() {
 
                 @Override
@@ -335,7 +356,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
             PlanungskalenderApi api = new PlanungskalenderApi(Events.this);
             Map<String, String> cookies = new HashMap<>();
             cookies.put("PHPSESSID", cookie);
-                api.EventsToDatabase(cookies);
+            api.EventsToDatabase(cookies);
 
             return "";
         }
@@ -356,6 +377,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
 
                 }
             });
+            backgroundRunning = false;
         }
     }
 

@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +33,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        Button loginBtn = (Button) findViewById(R.id.loginBtn);
+        Button loginBtn = findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(this);
 
-        Button offlineBtn = (Button) findViewById(R.id.offlineBtn);
+        Button offlineBtn = findViewById(R.id.offlineBtn);
         offlineBtn.setOnClickListener(this);
 
 
@@ -70,16 +71,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else if (checkForConnection()) {
                 //CHANGE LAYOUT
                 //
-                ProgressBar progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
+                ProgressBar progressBarLogin = findViewById(R.id.progressBarLogin);
                 progressBarLogin.setVisibility(View.VISIBLE);
 
                 loginBtn.setVisibility(View.GONE);
                 offlineBtn.setVisibility(View.GONE);
 
-                EditText usrnme = (EditText) findViewById(R.id.nameField);
+                EditText usrnme = findViewById(R.id.nameField);
                 usrnme.setVisibility(View.GONE);
 
-                EditText psswrd = (EditText) findViewById(R.id.passField);
+                EditText psswrd = findViewById(R.id.passField);
                 psswrd.setVisibility(View.GONE);
 
                 CheckBox CB = findViewById(R.id.checkBox);
@@ -103,14 +104,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (view.getId()) {
             case R.id.loginBtn:
-                ProgressBar progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
+                ProgressBar progressBarLogin = findViewById(R.id.progressBarLogin);
                 progressBarLogin.setVisibility(View.VISIBLE);
 
-                Button loginBtn = (Button) findViewById(R.id.loginBtn);
+                Button loginBtn = findViewById(R.id.loginBtn);
                 loginBtn.setVisibility(View.GONE);
 
-                EditText usrnme = (EditText) findViewById(R.id.nameField);
-                EditText psswrd = (EditText) findViewById(R.id.passField);
+                EditText usrnme = findViewById(R.id.nameField);
+                EditText psswrd = findViewById(R.id.passField);
 
                 String usr = usrnme.getText().toString();
                 String pss = psswrd.getText().toString();
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String result) {
 
-            TextView LoggedIn = (TextView) findViewById(R.id.textView);
+            TextView LoggedIn = findViewById(R.id.textView);
             LoggedIn.setText(result);
 
             if (result.equals("Login erfolgreich")) {
@@ -207,21 +208,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ProgressBar progressBarLogin = findViewById(R.id.progressBarLogin);
                 progressBarLogin.setVisibility(View.GONE);
 
-                Button loginBtn = (Button) findViewById(R.id.loginBtn);
+                Button loginBtn = findViewById(R.id.loginBtn);
                 loginBtn.setVisibility(View.VISIBLE);
 
                 if (uses_cookies) {
 
-                    Button offline = (Button) findViewById(R.id.offlineBtn);
+                    Button offline = findViewById(R.id.offlineBtn);
                     offline.setVisibility(View.VISIBLE);
 
-                    EditText usrnme = (EditText) findViewById(R.id.nameField);
+                    EditText usrnme = findViewById(R.id.nameField);
                     usrnme.setVisibility(View.VISIBLE);
 
-                    EditText psswrd = (EditText) findViewById(R.id.passField);
+                    EditText psswrd = findViewById(R.id.passField);
                     psswrd.setVisibility(View.VISIBLE);
 
-                    CheckBox cb = (CheckBox) findViewById(R.id.checkBox);
+                    CheckBox cb = findViewById(R.id.checkBox);
                     cb.setVisibility(View.VISIBLE);
 
                     LoggedIn.setText("Automatischer Login fehlgeschlagen");

@@ -37,7 +37,7 @@ public class RVAdapterTeilnehmer extends RecyclerView.Adapter<RVAdapterTeilnehme
             if (signedIn.get(i).contains("Guest")) {
 
                 eventViewHolder.eventSignedIn.setText("");
-                eventViewHolder.eventSignedInGuest.setText(signedIn.get(i).replace("Guest", ""));
+                eventViewHolder.eventSignedInGuest.setText(signedIn.get(i).replace("Guest", "").replace("comma",","));
             } else {
                 eventViewHolder.eventSignedIn.setText(signedIn.get(i));
                 eventViewHolder.eventSignedInGuest.setText("");
@@ -68,11 +68,11 @@ public class RVAdapterTeilnehmer extends RecyclerView.Adapter<RVAdapterTeilnehme
         EventViewHolder(View itemView) {
             super(itemView);
 
-            eventSignedIn = (TextView) itemView.findViewById(R.id.name);
-            eventSignedInGuest = (TextView) itemView.findViewById(R.id.name2);
-            id = (TextView) itemView.findViewById(R.id.id);
+            eventSignedIn = itemView.findViewById(R.id.name);
+            eventSignedInGuest = itemView.findViewById(R.id.name2);
+            id = itemView.findViewById(R.id.id);
 
-            divider = (View) itemView.findViewById(R.id.divider);
+            divider = itemView.findViewById(R.id.divider);
         }
     }
 }
