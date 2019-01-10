@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -102,6 +102,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
         final boolean refresh = intent.getBooleanExtra("refresh", false);
         if (refresh) {
             refreshData();
+
         }
         rv = findViewById(R.id.rv);
 
@@ -332,9 +333,9 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
 
     //TODO access refreshData() from "EventDetails" with api.refreshSignedIn
     public void refreshData() {
-
-        new refresh().execute();
-
+        if (checkForConnection()) {
+            new refresh().execute();
+        }
     }
 
 
@@ -394,6 +395,20 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
         Log.d("refreshData", Arrays.toString(eventarr3));
 
         //DEBUG^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }
+
+    private boolean checkForConnection() {
+
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
+            Toast.makeText(this, "Es konnte keine Verbindung zum Internet hergestellt werden", Toast.LENGTH_LONG).show();
+        }
+
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+
     }
 
 

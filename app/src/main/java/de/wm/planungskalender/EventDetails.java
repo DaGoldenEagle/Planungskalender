@@ -1,7 +1,10 @@
 package de.wm.planungskalender;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageView;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class EventDetails extends Activity {
     private RecyclerView rvsi;
@@ -78,10 +82,12 @@ public class EventDetails extends Activity {
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(checkForConnection()) {
 
-                new LongOperationSignUp().execute("" + EventID, "" + UserID, cookie);
-                signUp.setVisibility(View.GONE);
-                signOut.setText("Anmeldung \nzurücknehmen");
+                    new LongOperationSignUp().execute("" + EventID, "" + UserID, cookie);
+                    signUp.setVisibility(View.GONE);
+                    signOut.setText("Anmeldung \nzurücknehmen");
+                }
 
             }
         });
@@ -89,20 +95,26 @@ public class EventDetails extends Activity {
             @Override
             public void onClick(View v) {
                 if (signOut.getText().toString().contains("Abmeldung")) {
-                    new RevertSignInOut().execute("" + EventID, "" + UserID, cookie);
+                    if(checkForConnection()) {
+                        new RevertSignInOut().execute("" + EventID, "" + UserID, cookie);
 
-                    signUp.setVisibility(View.VISIBLE);
+                        signUp.setVisibility(View.VISIBLE);
 
-                    signOut.setText("Abmelden");
+                        signOut.setText("Abmelden");
+                    }
                 } else if (signOut.getText().toString().contains("Anmeldung")) {
+                    if(checkForConnection()) {
 
-                    new RevertSignInOut().execute("" + EventID, "" + UserID, cookie, "rem");
-                    signUp.setVisibility(View.VISIBLE);
-                    signOut.setText("Abmelden");
+                        new RevertSignInOut().execute("" + EventID, "" + UserID, cookie, "rem");
+                        signUp.setVisibility(View.VISIBLE);
+                        signOut.setText("Abmelden");
+                    }
                 } else {
-                    new LongOperationSignOut().execute("" + EventID, "" + UserID, cookie);
-                    signUp.setVisibility(View.GONE);
-                    signOut.setText("Abmeldung \nzurücknehmen");
+                    if(checkForConnection()) {
+                        new LongOperationSignOut().execute("" + EventID, "" + UserID, cookie);
+                        signUp.setVisibility(View.GONE);
+                        signOut.setText("Abmeldung \nzurücknehmen");
+                    }
                 }
             }
         });
@@ -115,7 +127,7 @@ public class EventDetails extends Activity {
         TextView date = findViewById(R.id.date);
         TextView users = findViewById(R.id.users);
         TextView signedUp = findViewById(R.id.signedUp);
-        View signedUpPic = findViewById(R.id.imageView4);
+        AppCompatImageView signedUpPic = findViewById(R.id.imageView4);
         Toolbar name = findViewById(R.id.toolbar);
         TextView info = findViewById(R.id.infoInsert);
         Button signUp = findViewById(R.id.signUp3);
@@ -140,6 +152,17 @@ public class EventDetails extends Activity {
             View infoview = findViewById(R.id.imageView6);
             infoview.setVisibility(View.GONE);
             info.setVisibility(View.GONE);
+        }
+
+        switch (EventDetails.get_isSignedIn()) {
+            case "?":   signedUpPic.setImageResource(R.drawable.ic_person_black_24dp);
+                break;
+            case "Ja":signedUpPic.setImageResource(R.drawable.ic_person_green);
+                break;
+            case "Nein": signedUpPic.setImageResource(R.drawable.ic_person_red);
+                break;
+            default:
+                break;
         }
 
     }
@@ -288,5 +311,19 @@ public class EventDetails extends Activity {
         myIntent.putExtra("Cookies","");
         this.startActivity(myIntent);
         super.finish();
+    }
+
+    private boolean checkForConnection() {
+
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(!(activeNetworkInfo != null && activeNetworkInfo.isConnected())){
+            Toast.makeText(this, "Es konnte keine Verbindung zum Internet hergestellt werden", Toast.LENGTH_LONG).show();
+        }
+
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+
     }
 }

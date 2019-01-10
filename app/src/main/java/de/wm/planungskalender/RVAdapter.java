@@ -1,5 +1,7 @@
 package de.wm.planungskalender;
 
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,17 +50,30 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.EventViewHolder> {
 
             eventViewHolder.eventUsers.setText(String.valueOf(events.get(i).get_users()));
             if (isOffline) {
-                eventViewHolder.eventSignedUp.setText(events.get(i).get_isSignedIn());
-            } else if (events.get(i).get_isSignedIn().contains("?")) {
-                eventViewHolder.eventSignedUp.setText(events.get(i).get_isSignedIn());
+                eventViewHolder.eventSignedUp.setVisibility(View.GONE);
+                eventViewHolder.eventSignedUpPic.setVisibility(View.GONE);
             } else {
+
+                eventViewHolder.eventSignedUp.setVisibility(View.VISIBLE);
+                eventViewHolder.eventSignedUpPic.setVisibility(View.VISIBLE);
+                AppCompatImageView person = (AppCompatImageView) eventViewHolder.eventSignedUpPic;
+                switch (events.get(i).get_isSignedIn()) {
+                    case "?":   person.setImageResource(R.drawable.ic_person_black_24dp);
+                        break;
+                    case "Ja":person.setImageResource(R.drawable.ic_person_green);
+                        break;
+                    case "Nein": person.setImageResource(R.drawable.ic_person_red);
+                        break;
+                    default:
+                        break;
+                }
                 eventViewHolder.eventSignedUp.setText(events.get(i).get_isSignedIn());
+
             }
             eventViewHolder.eventNum.setText(String.valueOf(events.get(i).get_id()));
 
             eventViewHolder.id.setText(String.valueOf(i));
             eventViewHolder.id.setVisibility(View.GONE);
-
 
 
         }
@@ -100,8 +115,6 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.EventViewHolder> {
             id = itemView.findViewById(R.id.id);
         }
     }
-
-
 
 
 }

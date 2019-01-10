@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         Button loginBtn = findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(this);
+
 
         Button offlineBtn = findViewById(R.id.offlineBtn);
         offlineBtn.setOnClickListener(this);
@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.offlineBtn:
                 Intent myIntent = new Intent(MainActivity.this, Events.class);
                 myIntent.putExtra("isOffline", true);
+
                 this.startActivity(myIntent);
                 finish();
                 break;

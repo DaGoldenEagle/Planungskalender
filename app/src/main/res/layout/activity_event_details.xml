@@ -264,9 +264,9 @@
                             android:id="@+id/teilnehmer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="12dp"
                             android:layout_marginStart="12dp"
                             android:layout_marginTop="12dp"
+                            android:layout_marginEnd="12dp"
                             android:text="@string/teilnehmer"
                             android:textStyle="bold" />
 
@@ -276,7 +276,9 @@
                             android:layout_height="match_parent"
                             android:clickable="false"
                             android:contextClickable="false"
-                            android:longClickable="false" />
+                            android:isScrollContainer="false"
+                            android:longClickable="false"
+                            android:nestedScrollingEnabled="false" />
 
                         <View
                             android:id="@+id/div"
@@ -308,9 +310,9 @@
                             android:id="@+id/abgesagt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="12dp"
                             android:layout_marginStart="12dp"
                             android:layout_marginTop="12dp"
+                            android:layout_marginEnd="12dp"
                             android:text="@string/abgesagt"
                             android:textStyle="bold" />
 
@@ -320,7 +322,8 @@
                             android:layout_height="match_parent"
                             android:clickable="false"
                             android:contextClickable="false"
-                            android:longClickable="false" />
+                            android:longClickable="false"
+                            android:nestedScrollingEnabled="false" />
 
                         <View
                             android:id="@+id/div2"
