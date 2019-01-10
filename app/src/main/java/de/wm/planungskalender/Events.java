@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 
@@ -100,7 +102,7 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
             cookie = sharedPref.getString("cookie", null);
         }
         final boolean refresh = intent.getBooleanExtra("refresh", false);
-        if (refresh) {
+        if (refresh&&!isOffline) {
             refreshData();
 
         }
@@ -217,6 +219,16 @@ public class Events extends AppCompatActivity implements NavigationView.OnNaviga
             }
         });
 
+        FloatingActionButton fab = findViewById(R.id.floatingActionButton3);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent myIntent = new Intent(Events.this, NewEvent.class);
+
+                startActivity(myIntent);
+            }
+        });
 
     }
 

@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -65,124 +66,8 @@ public class PlanungskalenderApi {
             //
 
 
-            Elements noLogin = doc.select("b");
+            return getData(doc, Cookies);
 
-
-            if (noLogin.html().contains("anmelden")) {
-                returnString = "Login fehlgeschlagen (Name/Passwort falsch).";
-                resultStr = "noLogin";
-
-            } else {
-                deleteDatabase();
-
-
-                Element table = doc.select("table").get(4);
-                Elements rows = table.select("tr");
-
-
-                for (int i = 1; i < rows.size(); i++) { //first row skipped (Beschreibung)
-                    Element row = rows.get(i);
-                    Elements cols = row.select("td");
-
-                    Element prevrow = rows.get(i - 1);
-                    Elements prevcols = prevrow.select("td");
-
-                    int intj = 1;
-                    if (cols.get(0).html().equalsIgnoreCase("&nbsp;")) { //Test if date is displayed in previous row
-                        //events on same date as previous
-                        while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")) {
-                            intj++;
-                            prevrow = rows.get(i - intj);
-                        }
-                        prevcols = prevrow.select("td");
-                        Element id = cols.get(2);
-                        String ID = id.html();
-                        ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
-                        int ID_INT = Integer.parseInt(ID);
-
-                        Elements eventname = cols.get(2).select("a");
-                        String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
-
-                        Element users = cols.get(4);
-                        int USERS = Integer.parseInt(users.html());
-
-                        Elements date = prevcols.get(0).select("a");
-
-                        int j = 0;
-                        while (date.html().equalsIgnoreCase("&nbsp;")) {
-                            j++;
-                            prevrow = rows.get(i - j);
-                            prevcols = prevrow.select("td");
-                            date = prevcols.get(0).select("a");
-                        }
-                        String DATE = date.html();
-
-
-                        Element time = cols.get(1);
-                        String TIME = time.html().replace("&nbsp;", "");
-
-                        Element isSignedIn = cols.get(5);
-                        String ISSIGNEDIN;
-                        if (isSignedIn.html().contains("<a")) {
-                            ISSIGNEDIN = "?";
-                        } else {
-                            ISSIGNEDIN = isSignedIn.html();
-                        }
-                        newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
-
-                    } else {
-
-                        Element id = cols.get(3);
-                        String ID = id.html();
-                        ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
-                        int ID_INT = Integer.parseInt(ID);
-
-                        Elements eventname = cols.get(3).select("a");
-                        String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
-
-                        Element users = cols.get(5);
-
-                        int USERS = Integer.parseInt(users.html());
-
-                        Elements date = cols.get(0).select("a");
-                        String DATE = date.html();
-
-
-                        Element time = cols.get(2);
-                        String TIME = time.html().replace("&nbsp;", "");
-
-                        Element isSignedIn = cols.get(6);
-                        String ISSIGNEDIN;
-                        if (isSignedIn.html().contains("<a")) {
-                            ISSIGNEDIN = "?";
-                        } else {
-                            ISSIGNEDIN = isSignedIn.html();
-                        }
-                        newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
-                    }
-
-                    DBHandler dbHandler = new DBHandler(context, null, null, 1);
-                    DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
-                    for (int k = 1; k <= rows.size(); k++) {
-                        if (dbHandler.findEventByRealId(k) != null) {
-                            dbHandlerBackup.addEvent(dbHandler.findEventById(k));
-                        }
-                    }
-
-                    returnString = "Login erfolgreich";
-                    resultStr = "login";
-
-
-                }
-
-
-            }
-
-            //
-            //
-            //
-            //
-            //
         } else {
 
             returnString = "Es konnte keine Verbindung zum Internet aufgebaut werden!";
@@ -201,11 +86,11 @@ public class PlanungskalenderApi {
 
     public Map<String, String> EventsToDatabase(Map<String, String> CookiesMap) {
 
-        Map<String, String> result = new HashMap<>();
-        String resultStr = "";
-        String returnString = "";
         Map<String, String> Cookies = CookiesMap;
 
+        Map<String, String> result = new HashMap<>();
+        String resultStr;
+        String returnString;
 
         if (checkForConnection()) {
             Connection.Response res = null;
@@ -227,143 +112,146 @@ public class PlanungskalenderApi {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return getData(doc, Cookies);
+        } else
 
-            //
-            //
-            //      Table into Database
-            //
-            //
-
-
-            Elements noLogin = doc.select("b");
-
-
-            if (noLogin.html().contains("anmelden")) {
-                returnString = "Login fehlgeschlagen (Name/Passwort falsch).";
-                resultStr = "noLogin";
-
-            } else {
-                deleteDatabase();
-
-
-                Element table = doc.select("table").get(4);
-                Elements rows = table.select("tr");
-
-                //TODO keine Uhrzeit beim Event
-                for (int i = 1; i < rows.size(); i++) { //first row skipped (Beschreibung)
-                    Element row = rows.get(i);
-                    Elements cols = row.select("td");
-
-                    Element prevrow = rows.get(i - 1);
-                    Elements prevcols;
-                    int intj = 1;
-                    if (cols.get(0).html().equalsIgnoreCase("&nbsp;")) { //Test if date is displayed in previous row
-                        //events on same date as previous
-                        while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")) {
-                            intj++;
-                            prevrow = rows.get(i - intj);
-                        }
-                        prevcols = prevrow.select("td");
-
-                        Element id = cols.get(2);
-                        String ID = id.html();
-                        ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
-                        int ID_INT = Integer.parseInt(ID);
-
-                        Elements eventname = cols.get(2).select("a");
-                        String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
-
-                        Element users = cols.get(4);
-                        int USERS = Integer.parseInt(users.html());
-
-                        Elements date = prevcols.get(0).select("a");
-
-                        int j = 0;
-                        while (date.html().equalsIgnoreCase("&nbsp;")) {
-                            j++;
-                            prevrow = rows.get(i - j);
-                            prevcols = prevrow.select("td");
-                            date = prevcols.get(0).select("a");
-                        }
-                        String DATE = date.html();
-
-
-                        Element time = cols.get(1);
-                        String TIME = time.html().replace("&nbsp;", "");
-
-                        Element isSignedIn = cols.get(5);
-                        String ISSIGNEDIN;
-                        if (isSignedIn.html().contains("<a")) {
-                            ISSIGNEDIN = "?";
-                        } else {
-                            ISSIGNEDIN = isSignedIn.html();
-                        }
-                        newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
-
-                    } else {
-
-                        Element id = cols.get(3);
-                        String ID = id.html();
-                        ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
-                        int ID_INT = Integer.parseInt(ID);
-
-                        Elements eventname = cols.get(3).select("a");
-                        String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
-
-                        Element users = cols.get(5);
-
-                        int USERS = Integer.parseInt(users.html());
-
-                        Elements date = cols.get(0).select("a");
-                        String DATE = date.html();
-
-
-                        Element time = cols.get(2);
-                        String TIME = time.html().replace("&nbsp;", "");
-
-                        Element isSignedIn = cols.get(6);
-                        String ISSIGNEDIN;
-                        if (isSignedIn.html().contains("<a")) {
-                            ISSIGNEDIN = "?";
-                        } else {
-                            ISSIGNEDIN = isSignedIn.html();
-                        }
-                        newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
-                    }
-
-
-                }
-                DBHandler dbHandler = new DBHandler(context, null, null, 1);
-                DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
-                for (int i = 1; i <= rows.size(); i++) {
-                    if (dbHandler.findEventByRealId(i) != null) {
-                        dbHandlerBackup.addEvent(dbHandler.findEventById(i));
-                    }
-                }
-
-                //dbHandlerBackup.addEvent(new Event(999,"Backup",66,"12.12.2018","00:00","lol ez",new ArrayList<String>(),new ArrayList<String>(),"lol","Ja"));
-
-                returnString = "Login erfolgreich";
-                resultStr = "login";
-
-
-            }
-
-            //
-            //
-            //
-            //
-            //
-        } else {
+        {
 
             returnString = "Es konnte keine Verbindung zum Internet aufgebaut werden!";
             resultStr = "noInet";
 
-        }
+            result.put("result", resultStr);
+            result.put("returnString", returnString);
+            result.putAll(Cookies);
 
+
+            return result;
+
+        }
+    }
+
+    private Map<String, String> getData(Document doc, Map<String, String> Cookies) {
+
+        Map<String, String> result = new HashMap<>();
+        String resultStr = "";
+        String returnString = "";
+
+        Elements noLogin = doc.select("b");
+
+
+        if (noLogin.html().contains("anmelden")) {
+            returnString = "Login fehlgeschlagen (Name/Passwort falsch).";
+            resultStr = "noLogin";
+
+        } else {
+            deleteDatabase();
+
+
+            Element table = doc.select("table").get(4);
+            Elements rows = table.select("tr");
+
+            //TODO keine Uhrzeit beim Event
+            for (int i = 1; i < rows.size(); i++) { //first row skipped (Beschreibung)
+                Element row = rows.get(i);
+                Elements cols = row.select("td");
+
+                Element prevrow = rows.get(i - 1);
+                Elements prevcols;
+                int intj = 1;
+                if (cols.get(0).html().equalsIgnoreCase("&nbsp;")) { //Test if date is displayed in previous row
+                    //events on same date as previous
+                    while (prevrow.select("td").get(0).html().equalsIgnoreCase("&nbsp;")) {
+                        intj++;
+                        prevrow = rows.get(i - intj);
+                    }
+                    prevcols = prevrow.select("td");
+
+                    Element id = cols.get(2);
+                    String ID = id.html();
+                    ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
+                    int ID_INT = Integer.parseInt(ID);
+
+                    Elements eventname = cols.get(2).select("a");
+                    String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
+
+                    Element users = cols.get(4);
+                    int USERS = Integer.parseInt(users.html());
+
+                    Elements date = prevcols.get(0).select("a");
+
+                    int j = 0;
+                    while (date.html().equalsIgnoreCase("&nbsp;")) {
+                        j++;
+                        prevrow = rows.get(i - j);
+                        prevcols = prevrow.select("td");
+                        date = prevcols.get(0).select("a");
+                    }
+                    String DATE = date.html();
+
+
+                    Element time = cols.get(1);
+                    String TIME = time.html().replace("&nbsp;", "");
+
+                    Element isSignedIn = cols.get(5);
+                    String ISSIGNEDIN;
+                    if (isSignedIn.html().contains("<a")) {
+                        ISSIGNEDIN = "?";
+                    } else {
+                        ISSIGNEDIN = isSignedIn.html();
+                    }
+                    newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
+
+                } else {
+
+                    Element id = cols.get(3);
+                    String ID = id.html();
+                    ID = ID.substring(47, 53).replace("\"", "").replace(">", "");
+                    int ID_INT = Integer.parseInt(ID);
+
+                    Elements eventname = cols.get(3).select("a");
+                    String NAME = eventname.html().replace("<b>", "").replace("</b>", "");
+
+                    Element users = cols.get(5);
+
+                    int USERS = Integer.parseInt(users.html());
+
+                    Elements date = cols.get(0).select("a");
+                    String DATE = date.html();
+
+
+                    Element time = cols.get(2);
+                    String TIME = time.html().replace("&nbsp;", "");
+
+                    Element isSignedIn = cols.get(6);
+                    String ISSIGNEDIN;
+                    if (isSignedIn.html().contains("<a")) {
+                        ISSIGNEDIN = "?";
+                    } else {
+                        ISSIGNEDIN = isSignedIn.html();
+                    }
+                    newEvent(ID_INT, NAME, USERS, DATE, TIME, Cookies, ISSIGNEDIN);
+                }
+
+
+            }
+            DBHandler dbHandler = new DBHandler(context, null, null, 1);
+            DBHandlerBackup dbHandlerBackup = new DBHandlerBackup(context, null, null, 1);
+            for (int i = 1; i <= rows.size(); i++) {
+                if (dbHandler.findEventById(i) != null) {
+                    dbHandlerBackup.addEvent(dbHandler.findEventById(i));
+                }
+            }
+
+            //dbHandlerBackup.addEvent(new Event(999,"Backup",66,"12.12.2018","00:00","lol ez",new ArrayList<String>(),new ArrayList<String>(),"lol","Ja"));
+
+            returnString = "Login erfolgreich";
+            resultStr = "login";
+
+
+        }
         result.put("result", resultStr);
         result.put("returnString", returnString);
-        result.putAll(Cookies);
+        result.put("cookie", Cookies.get("PHPSESSID"));
 
 
         return result;
@@ -658,10 +546,6 @@ public class PlanungskalenderApi {
         if (signedOutTable != null && signedOutTable.html().contains("tr")) {
             signedOut = getSignedOut(signedOutTable.select("tr"));
         }
-
-
-
-
 
 
         Event event = new Event(id, eventname, users, date, time, creator, signedIn, signedOut, info, isSignedIn);

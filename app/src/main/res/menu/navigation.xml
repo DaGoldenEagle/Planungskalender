@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_event"
+        android:icon="@drawable/ic_add_box_black_24dp"
+        android:title="@string/neues_event" />
+
+    <item
+        android:id="@+id/navigation_musikprobe"
+        android:icon="@drawable/ic_add_circle_black_24dp"
+        android:title="@string/neue_musikproben" />
+
+</menu>

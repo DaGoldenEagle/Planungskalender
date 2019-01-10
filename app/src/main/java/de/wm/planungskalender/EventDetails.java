@@ -21,7 +21,7 @@ public class EventDetails extends Activity {
     private RecyclerView rvsi;
     private RecyclerView rvso;
     private Activity activity;
-
+    boolean isOffline;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +31,7 @@ public class EventDetails extends Activity {
         final int EventID = intent.getIntExtra("EventID", 0);
         final int UserID = intent.getIntExtra("UserID", 0);
         final String cookie = intent.getStringExtra("cookie");
-        boolean isOffline = intent.getBooleanExtra("isOffline", false);
+         isOffline= intent.getBooleanExtra("isOffline", false);
 
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
 
@@ -309,6 +309,7 @@ public class EventDetails extends Activity {
         Intent myIntent = new Intent(this, Events.class);
         myIntent.putExtra("refresh",true);
         myIntent.putExtra("Cookies","");
+        myIntent.putExtra("isOffline",isOffline);
         this.startActivity(myIntent);
         super.finish();
     }
